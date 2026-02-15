@@ -1,72 +1,10 @@
 // TODO: write code here
-import '../css/style.css';
-import goblinImage from '../img/goblin.png';
+import TraversingGoblin from '../components/goblin/goblin';
+import { Score } from '../components/score/score';
 
-export default class TraversingGoblin {
-  constructor(){// В конструкторе ИНИЦИАЛИЗИРУЕМ свойства    
-    this.totalCells = 16;
-    this.currentPosition = null;
+window.addEventListener('DOMContentLoaded', () => { //Запуск при загрузке страницы
+  const goblin = new TraversingGoblin();
+  const score = new Score(goblin);
+});
 
-    this.gameInterval = null;
-    this.isGameRunning = false;
-    
-    this.init();// ВЫЗЫВАЕМ метод инициализации у этого экземпляра
-  }
-
-  init(){// ОПРЕДЕЛЯЕМ метод для класса
-    this.createBoard();// Создаём поле
-    this.createGoblin();// Создаём гоблина
-    this.startGame();
-  }
-
-  createBoard(){
-    const gameBoard = document.querySelector('.game-board');// Находим контейнер
-    gameBoard.innerHTML = ''; // Очищаем (на случай перезапуска)
-
-    for(let i = 0; i < this.totalCells; i++){
-      const cell = document.createElement('div');
-      cell.classList.add('cell');//Добавляем класс для ячейки - будет: class="cell"
-      cell.dataset.id = i;//Добавляем data-атрибут для этой же ячейки - будет: data-id="0"
-      gameBoard.append(cell);//Добавляем узел в DOM в конец списка дочерних
-    }
-  }
-
-  createGoblin(){
-    const oldGoblin = document.querySelector('.goblin');
-    if (oldGoblin) { // Удаляем старого гнома (при сбросе игры)
-      oldGoblin.remove();
-    }
-
-    this.goblin = document.createElement('img');
-    this.goblin.classList.add('goblin');
-    this.goblin.src = goblinImage;
-  }
-
-  moveGoblinRandomly(){
-    let newPosition;
-    do {//цикл сначала выполняет код, потом проверяет условие
-      newPosition = Math.floor(Math.random()*this.totalCells);//случайная позиция из 16 клеток, округляется вниз до меньшего - случайно сгенерированное
-    } while (newPosition === this.currentPosition)//цикл повторяется, если 
-
-    this.currentPosition = newPosition;//новая позиция
-
-    const targetCell = document.querySelector(`.cell[data-id='${this.currentPosition}']`); //ищем клетку по data-id="this.currentPosition"
-    
-    targetCell.append(this.goblin);// Перемещаем гнома
-  }
-
-  startGame(){
-    if (this.isGameRunning) {
-      return;
-    }
-
-    this.isGameRunning = true; 
-
-    this.moveGoblinRandomly();  // ← Первое появление сразу, потом каждые 2 секунды
-
-    this.gameInterval = setInterval (() => {// Таймер: каждые 2 секунды перемещаем гнома
-      this.moveGoblinRandomly();
-    }, 2000);
-  }
-};
 

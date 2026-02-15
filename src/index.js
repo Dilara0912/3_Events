@@ -1,7 +1,4 @@
 // TODO: write your code in app.js
-import TraversingGoblin from './js/app.js';
+import './css/style.css';
 
-window.addEventListener('DOMContentLoaded', () => { //Запуск при загрузке страницы
-  new TraversingGoblin();
-});
-
+import './js/app'

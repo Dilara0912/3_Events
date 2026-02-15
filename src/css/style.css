@@ -6,38 +6,9 @@
 
 .container {
     margin-top: 20px;
-    text-align: center;    
+    text-align: center;        
 }
 
 h1 {
     color: #0e39bc;
-
-}
-
-.game-board {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(4, 1fr);
-    gap: 10px;
-    margin: 30px auto;
-    max-width: 500px;
-    aspect-ratio: 1;
-    background: rgba(126, 216, 232, 0.3);
-    padding: 10px;
-    border-radius: 15px;
-    border: 3px solid #d1cceb;
-}
-
-.cell {
-    background: rgba(77, 77, 203, 0.3);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;           
-}
-
-.goblin {
-    width: 90%;
-    height: 80%;
-    object-fit: contain;    
 }

@@ -2,14 +2,19 @@ import './score.css';
 
 export class Score {
 	constructor(goblin) {
-		this.goblin = goblin; // ссылка на гоблина для обратной связи
+		this.goblin = goblin || null; // ссылка на гоблина для обратной связи: сли гоблин передан - сохраняем, если нет - будет null
 		this.score = 0; // количество попаданий
 		this.misses = 0; // промахи
 		this.maxMisses = 5; // условие задачи - промахи max 5
 		this.gameActive = true;
 		this.createScoreDisplay();
 		this.addClickHandler();
+        this.modalHandlerCreated = false;//флаг, чтобы создать обработчик только один раз
 	}
+
+    setGoblin(goblin) {
+        this.goblin = goblin;
+    }
 
 	createScoreDisplay() { // Добавляем отображение счёта
 		const container = document.querySelector('.container'); // Находим контейнер
@@ -61,20 +66,66 @@ export class Score {
 		})
 	}
 
-	handleCellClick(clickedIndex) {
-		if (clickedIndex === this.goblin.currentPosition) { //значит попали и нужно засчитать +1
-			this.addScore(); //условие задачи -пользователю засчитывается +1 балл
-			this.goblin.hideGoblin(); //условие задачи - гоблин пропадает из ячейки
-		} else {
-			this.addMiss();
+	handleCellClick(clickedIndex) {  
+        const parseIntClickedIndex = parseInt(clickedIndex, 10);
+		if (parseIntClickedIndex === this.goblin.currentPosition) { //значит попали и нужно засчитать +1
+			this.goblin.hideGoblin(); //условие задачи - гоблин изсчез сразу из ячейки если по нему кликнули
+            this.addScore(); //условие задачи -пользователю засчитывается +1 балл			
+		    
+            if(this.goblin.goblinTimeout) {// Очищаем таймер исчезновения
+                clearTimeout(this.goblin.goblinTimeout);
+                this.goblin.goblinTimeout = null;
+            }
+            
+            this.goblin.moveGoblinRandomly();//гоблин сразу появляется в другой ячейке
+        } else {
+            this.addMiss();
 		}
 	}
+    
+    setupModal() {
+        const modal = document.querySelector('.modal-window');
+        modal.classList.toggle('hidden');
+
+        if (!this.modalHandlerCreated) {//Создаем обработчик ТОЛЬКО если его еще нет
+            const restartBtn = document.querySelector('.modal-button');               
+            
+            restartBtn.addEventListener('click', () => {
+                this.restartGame();      
+                modal.classList.toggle('hidden'); // Скрываем окно
+            })
+
+            this.modalHandlerCreated = true;
+        }
+    }
+
+    restartGame() {      
+        this.score = 0;
+        this.misses = 0;
+        this.gameActive = true;
+
+        this.scoreDisplay.innerHTML = `Счёт: ${this.score}`;
+		this.missesDisplay.innerHTML = `Пропустил гоблина: ${this.misses}`;              
+        if (this.goblin) {// Перезапускаем игру с гоблином
+            this.goblin.stopGame();// Останавливаем старую игру
+
+            const gameBoard = document.querySelector('.game-board');
+            gameBoard.innerHTML = '';
+            
+            this.goblin.init();
+        }           
+    }
 
 	gameOver() {
 		if (!this.gameActive) return; // ← Если игра окончена, ничего не делаем
-		console.log('ИГРА ОКОНЧЕНА! Слишком много промахов!');
-		this.goblin.stopGame();
+		
+        console.log('ИГРА ОКОНЧЕНА! Слишком много промахов!');
+        this.gameActive = false;
 
-		alert('ИГРА ОКОНЧЕНА! Слишком много промахов!');
+		if (this.goblin) {
+			this.goblin.stopGame();
+		}
+        
+        this.setupModal();        
 	}
 }

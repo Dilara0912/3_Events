@@ -3,7 +3,7 @@ import './goblin.css';
 import goblinImage from './goblin.png';
 
 export default class TraversingGoblin {
-  constructor(){// В конструкторе ИНИЦИАЛИЗИРУЕМ свойства    
+  constructor(score){// В конструкторе ИНИЦИАЛИЗИРУЕМ свойства    
     this.totalCells = 16;
     this.currentPosition = null;
 
@@ -11,7 +11,9 @@ export default class TraversingGoblin {
     this.isGameRunning = false;
 
     this.goblinTimeout = null;      // для таймера исчезновения
-    this.isGoblinVisible = false;   
+    this.isGoblinVisible = false;  
+    
+    this.score = score; // ссылка на счет из класса Score для обратной связи
     
     this.init();// ВЫЗЫВАЕМ метод инициализации у этого экземпляра
   }
@@ -42,6 +44,7 @@ export default class TraversingGoblin {
 
     this.goblin = document.createElement('img');
     this.goblin.classList.add('goblin');
+    this.goblin.alt = 'Изображение гоблина';
     this.goblin.src = goblinImage;
   }
 
@@ -69,9 +72,16 @@ export default class TraversingGoblin {
 
     this.showGoblin(newPosition);// Показываем гоблина в новой позиции
 
+    if (this.goblinTimeout) {// Очищаем предыдущий таймер
+            clearTimeout(this.goblinTimeout);
+    }
+
     this.goblinTimeout = setTimeout (() => { // Устанавливаем таймер на исчезновение через 1 секунду
       this.hideGoblin();
-      //this.currentPosition = null;// Сбрасываем текущую позицию
+    
+      if (this.score && this.score.gameActive) {
+        this.score.addMiss();// когда гоблин исчезает сам - засчитываем промах
+      }
     }, 1000);
   }
 
@@ -84,7 +94,7 @@ export default class TraversingGoblin {
 
     this.moveGoblinRandomly();  // ← Первое появление сразу, потом каждые 2 секунды
 
-    this.gameInterval = setInterval (() => {// Таймер: каждые 2 секунды перемещаем гнома
+    this.gameInterval = setInterval (() => {// Таймер: каждые 2 секунды перемещаем гоблина
       this.moveGoblinRandomly();
     }, 2000);
   }
